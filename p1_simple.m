@@ -39,8 +39,10 @@ cvx_begin
         v(:,N) == vf;
         % Dynamical constraints
         for i=1:N-1
-            v(:,i+1) == v(:,i) + dt*g + (1/2)*dt*(a(:,i) + a(:,i+1));
-            r(:,i+1) == r(:,i) + dt*v(:,i) + (1/6)*dt^2*(2*(a(:,i)+g) + (a(:,i+1)+g));
+            v(:,i+1) == v(:,i) + dt*(g + a(:,i));
+            r(:,i+1) == r(:,i) + dt*v(:,i) + (1/2)*dt^2*(a(:,i)+g);
+            %v(:,i+1) == v(:,i) + dt*g + (1/2)*dt*(a(:,i) + a(:,i+1));
+            %r(:,i+1) == r(:,i) + dt*v(:,i) + (1/6)*dt^2*(2*(a(:,i)+g) + (a(:,i+1)+g));
         end
         % Acceleration/Thrust limit
         for i=1:N
