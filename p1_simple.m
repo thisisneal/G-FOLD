@@ -21,7 +21,7 @@ rf = [ 0 ; 0 ];
 vf = [ 0 ; 0];
 
 tf = 75;
-dt = .75; % 1 hz discrete time nodes
+dt = 3.0; % 1 hz discrete time nodes
 N = (tf / dt) + 1;
 tv = 0:dt:tf;
 
@@ -39,10 +39,8 @@ cvx_begin
         v(:,N) == vf;
         % Dynamical constraints
         for i=1:N-1
-            v(:,i+1) == v(:,i) + dt*(g + a(:,i));
-            r(:,i+1) == r(:,i) + dt*v(:,i) + (1/2)*dt^2*(a(:,i)+g);
-            %v(:,i+1) == v(:,i) + dt*g + (1/2)*dt*(a(:,i) + a(:,i+1));
-            %r(:,i+1) == r(:,i) + dt*v(:,i) + (1/6)*dt^2*(2*(a(:,i)+g) + (a(:,i+1)+g));
+            v(:,i+1) == v(:,i) + dt*g + (1/2)*dt*(a(:,i) + a(:,i+1));
+            r(:,i+1) == r(:,i) + dt*v(:,i) + (1/6)*dt^2*(2*(a(:,i)+g) + (a(:,i+1)+g));
         end
         % Acceleration/Thrust limit
         for i=1:N
@@ -72,8 +70,9 @@ figure; hold on;
 plot(tv, v(1,:), tv, v(2,:));
 title('Velocity (m/s)');
 
-figure;
+figure; hold on;
 plot(r(1,:), r(2,:));
+quiver(r(1,:), r(2,:), a(1,:), a(2,:), .25);
 title('Trajectory (m)');
 
 figure;
