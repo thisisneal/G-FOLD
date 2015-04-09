@@ -1,4 +1,6 @@
-% [x ; z]
+% Acikmese, Behcet, and Scott R. Ploen. "Convex programming approach to 
+% powered descent guidance for mars landing." 
+% Journal of Guidance, Control, and Dynamics 30.5 (2007): 1353-1366.
 
 % Vehicle fixed parameters
 m_dry = 1505;
@@ -19,26 +21,29 @@ rf = [ 0 ; 0 ];
 vf = [ 0 ; 0];
 
 tf = 75;
-dt = 1; % 1 hz discrete time nodes
+dt = .75; % 1 hz discrete time nodes
 N = (tf / dt) + 1;
 tv = 0:dt:tf;
 
 cvx_begin
-    variables r(2,N) a(2,N)
+    variables r(2,N) v(2,N) a(2,N)
     
     minimize( norm(a) )
     
     subject to
         % Initial condition constraints
         r(:,1) == r0;
-        r(:,2) == r0 + v0 * dt;
+        v(:,1) == v0;
         % Terminal condition constraints
-        r(:,N)   == rf;
-        r(:,N-1) == rf - vf * dt;
+        r(:,N) == rf;
+        v(:,N) == vf;
         % Dynamical constraints
-        for i=3:N
-            % Acceleration
-            (r(:,i) - 2*r(:,i-1) + r(:,i-2))/dt^2 == g + a(:,i);
+        for i=1:N-1
+            v(:,i+1) == v(:,i) + dt*g + (1/2)*dt*(a(:,i) + a(:,i+1));
+            r(:,i+1) == r(:,i) + dt*v(:,i) + (1/6)*dt^2*(2*(a(:,i)+g) + (a(:,i+1)+g));
+        end
+        % Acceleration/Thrust limit
+        for i=1:N
             norm(a(:,i)) <= T_max / m_wet; % Very conservative 
         end
         % No sub-surface flight
@@ -57,9 +62,13 @@ for i=1:N-1
     m(i+1) = m(i) + m_dot * dt;
 end
 
-figure;
+figure; hold on;
 plot(tv, r(1,:), tv, r(2,:));
 title('Position (m)');
+
+figure; hold on;
+plot(tv, v(1,:), tv, v(2,:));
+title('Velocity (m/s)');
 
 figure;
 plot(r(1,:), r(2,:));
