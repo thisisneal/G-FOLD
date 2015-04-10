@@ -1,29 +1,44 @@
+% Neal Bhasin
+% 2015-04-10
+% Implementation of convex programming algorithm for powered descent guidance.
+% Note: This script requires an installation of MATLAB CVX.
+
+% Primary reference:
 % Acikmese, Behcet, and Scott R. Ploen. "Convex programming approach to 
 % powered descent guidance for mars landing." 
 % Journal of Guidance, Control, and Dynamics 30.5 (2007): 1353-1366.
 
 % Vehicle fixed parameters
-m_dry = 1505;
-Isp = 225;
-g0 = 9.80665; % Standard earth gravity
-g = [0 ; -3.7114]; % Mars gravity vector
-max_throttle = 0.8;
-T_max = 6 * 3100 * max_throttle;
-phi = 27; % The cant angle of thrusters in degrees
+m_dry = 1505;       % Vehicle mass without fuel [kg]
+Isp = 225;          % Specific impulse [s]
+g0 = 9.80665;       % Standard earth gravity [m/s^2]
+g = [0 ; -3.7114];  % Mars gravity vector [m/s^2]
+max_throttle = 0.8; % Max open throttle [.%]
+T_max = 6 * 3100 * max_throttle; % Max thrust force [N]
+phi = 27;           % The cant angle of thrusters [deg]
 
 % Initial conditions
-m_wet = 1905;
-r0 = [  2 ; 1.5] * 1e3;
-v0 = [100 ; -75];
+m_wet = 1905;           % Vehicle mass with fuel [kg]
+r0 = [  2 ; 1.5] * 1e3; % Initial position [x;z] [m]
+v0 = [100 ; -75];       % Initial velocity [x;z] [m/s]
 
 % Target conditions
 rf = [ 0 ; 0 ];
 vf = [ 0 ; 0];
 
-tf = 75;
-dt = 3.0; % 1 hz discrete time nodes
+tf = 75;  % Target end time [s]
+dt = 3.0; % Discrete node time interval [s]
 N = (tf / dt) + 1;
 tv = 0:dt:tf;
+
+% Approximates optimal landing (problem 1) by minimizing total
+%  acceleration, and constraining acceleration within very conservative
+%  linear bounds that guarantee a feasible trajectory, if one is possible.
+
+% Initial and terminal state conditions are equality constraints, 
+% Dynamics are represented as equality constraints between nodes with
+%  acceleration from thrust as piecewise linear,
+% Subsurface flight is prevented by linear inequality constraints on altitude
 
 cvx_begin
     variables r(2,N) v(2,N) a(2,N)
@@ -50,10 +65,11 @@ cvx_begin
         r(2,:) >= -1;
 cvx_end
 
+% Acceleration vector magnitudes and directions
 a_norms = norms(a);
 a_dirs = rad2deg(atan2(a(2,:), a(1,:)));
 
-% Compute vehicle mass over time
+% Compute approximate vehicle mass over time
 m = zeros(1, N);
 m(1) = m_wet;
 for i=1:N-1
@@ -62,6 +78,7 @@ for i=1:N-1
     m(i+1) = m(i) + m_dot * dt;
 end
 
+% Plot results
 figure; hold on;
 plot(tv, r(1,:), tv, r(2,:));
 title('Position (m)');
