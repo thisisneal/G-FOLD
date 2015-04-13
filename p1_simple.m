@@ -1,6 +1,7 @@
 % Neal Bhasin
 % 2015-04-10
-% Implementation of convex programming algorithm for powered descent guidance.
+% Implementation of simplified convex programming algorithm for 
+%  planetary powered descent guidance.
 % Note: This script requires an installation of MATLAB CVX.
 
 % Primary reference:
@@ -24,7 +25,7 @@ v0 = [100 ; -75];       % Initial velocity [x;z] [m/s]
 
 % Target conditions
 rf = [ 0 ; 0 ];
-vf = [ 0 ; 0];
+vf = [ 0 ; 0 ];
 
 tf = 75;  % Target end time [s]
 dt = 3.0; % Discrete node time interval [s]
@@ -32,8 +33,8 @@ N = (tf / dt) + 1;
 tv = 0:dt:tf;
 
 % Approximates optimal landing (problem 1) by minimizing total
-%  acceleration, and constraining acceleration within very conservative
-%  linear bounds that guarantee a feasible trajectory, if one is possible.
+%  acceleration, and constraining acceleration within very conservative linear
+%  upper bounds that guarantee a feasible trajectory (ignoring lower bounds).
 
 % Initial and terminal state conditions are equality constraints, 
 % Dynamics are represented as equality constraints between nodes with
