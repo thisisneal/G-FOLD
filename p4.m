@@ -27,7 +27,7 @@ rf = [ 0 ; 0 ];
 vf = [ 0 ; 0 ];
 
 tf = 75;  % Target end time [s]
-dt = 3.0; % Discrete node time interval [s]
+dt = 1.0; % Discrete node time interval [s]
 N = (tf / dt) + 1;
 tv = 0:dt:tf;
 
@@ -65,8 +65,6 @@ cvx_begin
             z(i+1) == z(i) - (alpha*dt/2)*(s(i) + s(i+1));
         end
         % Thrust limit, mass flow limit
-        z0s = [];
-        z1s = [];
         for i=1:N
             norm(u(:,i)) <= s(i);
             %
@@ -74,19 +72,19 @@ cvx_begin
             z1_term = m_wet - alpha * r1 * (i-1) * dt;
             z0 = log(z0_term);
             z1 = log(z1_term);
-            mu_1 = r1 * exp(-z0_term);
-            mu_2 = r2 * exp(-z0_term);
+            mu_1 = r1 / z0_term;
+            mu_2 = r2 / z0_term;
             
+            s(i) >= mu_1 * (1 - (z(i) - z0)); % Linear lower bound for CVX
             %s(i) >= mu_1 * (1 - (z(i) - z0) - (1/2)*(z(i) - z0)^2);
-            %s(i) <= mu_2 * (1 - (z(i) - z0));
+            s(i) <= mu_2 * (1 - (z(i) - z0));
             
-            %z(i) >= z0;
-            %z(i) <= z1;
-            %z0s(i) = z0;
-            %z1s(i) = z1;
+            z(i) >= z0;
+            z(i) <= z1;
             
             % hack
-            s(i) == r2 / z0_term;
+            %s(i) <= r2 / z0_term;
+            %s(i) >= r1 / z1_term;
         end
         % No sub-surface flight
         r(2,:) >= -1;
