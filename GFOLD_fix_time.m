@@ -4,8 +4,9 @@
 
 % Vehicle/planet parameters p must include:
 %  p.phi ; p.T_max ; p.max_throttle ; p.min_throttle ; p.Isp ; p.g
-function [m_used, r, v, u, m] = GFOLD_fix_time(tf, dt, r0, v0, rf, vf, m_wet, p)
-N = (tf / dt) + 1;
+function [m_used, r, v, u, m] = GFOLD_fix_time(tf, N, r0, v0, rf, vf, m_wet, p)
+%N = (tf / dt) + 1;
+dt = tf / (N - 1);
 
 g0 = 9.80665; % Standard earth gravity [m/s^2]
 alpha = 1 / (p.Isp * g0 * cosd(p.phi));

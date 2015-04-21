@@ -13,6 +13,9 @@ function [xmin, fmin] = golden(f, ax, bx, cx, tol)
 %   is continuous between ax and cx
 %
 %   Roman Geus, ETH Zuerich, 9.12.97
+%
+%   Modified: Neal Bhasin 2015-04-21
+%   - Use absolute tolerance
  
 C = (3-sqrt(5))/2;
 R = 1-C;
@@ -30,8 +33,9 @@ f1 = feval(f,x1);
 f2 = feval(f,x2);
  
 k = 1;
-while abs(x3-x0) > tol*(abs(x1)+abs(x2)),
+while abs(x3-x0) > tol,
   fprintf(1,'k=%4d, |a-b|=%e\n', k, abs(x3-x0));
+  fprintf(1,'x1=%d, x2=%d\n', x1, x2);
   if f2 < f1,
     x0 = x1;
     x1 = x2;
