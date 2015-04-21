@@ -92,11 +92,12 @@ cvx_begin
         r(2,:) >= -1;
 cvx_end
 
+% Plotting
 u_norms = norms(u);
+u_dirs = rad2deg(atan2(u(2,:), u(1,:)));
 m_vals = exp(z);
 T_vals = u_norms .* m_vals;
 
-% Plot results
 figure; hold on;
 plot(tv, r(1,:), tv, r(2,:));
 title('Position (m)');
@@ -117,14 +118,14 @@ title('Acceleration (m/s^2)');
 figure; hold on;
 plot(tv, T_vals);
 title('Thrust (N)');
-% 
-% figure;
-% plot(tv, u_norms);
-% title('Acceleration (m/s^2)');
-% 
-% figure;
-% plot(tv, a_dirs);
-% title('Acceleration (deg)');
+
+figure;
+plot(tv, u_norms);
+title('Acceleration (m/s^2)');
+
+figure;
+plot(tv, u_dirs);
+title('Acceleration (deg)');
 
 figure;
 plot(tv, exp(z));
