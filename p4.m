@@ -4,7 +4,10 @@
 % Note: This script requires an installation of MATLAB CVX.
 
 % Primary reference:
-% Açikmese, Behçet, et al. "Enhancements on the convex programming based 
+% [1] Acikmese, Behcet, and Scott R. Ploen. "Convex programming approach to 
+% powered descent guidance for mars landing." 
+% Journal of Guidance, Control, and Dynamics 30.5 (2007): 1353-1366.
+% [2] Acikmese, Behcet, et al. "Enhancements on the convex programming based 
 % powered descent guidance algorithm for mars landing." (2008).
 
 % Vehicle fixed parameters
@@ -31,16 +34,20 @@ dt = 1.0; % Discrete node time interval [s]
 N = (tf / dt) + 1;
 tv = 0:dt:tf;
 
-% Description: ___
+% Description: Implementation of Problem 4 of [2]. Solves the fuel
+%  optimal landing divert given intial and desired terminal conditions.
+%  Uses a fixed total flight time and discretization and disallows subsurface
+%  flight. Results correspond with Figure 6 of [1].
 
 % z === ln m
 % u === T / m
-% s === G / m
+% s === G / m, where |T| <= G
 
 alpha = 1 / (Isp * g0 * cosd(phi));
 r1 = min_throttle * T_max * cosd(phi);
 r2 = max_throttle * T_max * cosd(phi);
 
+cvx_solver SEDUMI
 cvx_begin
     % Parameterize trajectory position, velocity, thrust acceleration, ln mass
     variables r(2,N) v(2,N) u(2,N) z(1,N) s(1,N)
@@ -67,24 +74,19 @@ cvx_begin
         % Thrust limit, mass flow limit
         for i=1:N
             norm(u(:,i)) <= s(i);
-            %
+            % Feasible/conservative Taylor series expansion
             z0_term = m_wet - alpha * r2 * (i-1) * dt;
             z1_term = m_wet - alpha * r1 * (i-1) * dt;
             z0 = log(z0_term);
             z1 = log(z1_term);
             mu_1 = r1 / z0_term;
             mu_2 = r2 / z0_term;
-            
-            s(i) >= mu_1 * (1 - (z(i) - z0)); % Linear lower bound for CVX
-            %s(i) >= mu_1 * (1 - (z(i) - z0) - (1/2)*(z(i) - z0)^2);
+            % Quadratic lower bound, linear upper bound
+            s(i) >= mu_1 * (1 - (z(i) - z0) + (1/2)*(z(i) - z0)^2);
             s(i) <= mu_2 * (1 - (z(i) - z0));
-            
+            % Impose physical extremal mass limits
             z(i) >= z0;
             z(i) <= z1;
-            
-            % hack
-            %s(i) <= r2 / z0_term;
-            %s(i) >= r1 / z1_term;
         end
         % No sub-surface flight
         r(2,:) >= -1;
