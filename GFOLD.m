@@ -4,6 +4,8 @@
 
 % Vehicle/planet parameters p must include:
 %  p.phi ; p.T_max ; p.max_throttle ; p.min_throttle ; p.Isp ; p.m_dry ; p.g
+
+% 
 function [m_used, r, v, u, m] = GFOLD(N, r0, v0, rf, vf, m_wet, p)
     tic;
     g0 = 9.80665; % Standard earth gravity [m/s^2]

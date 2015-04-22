@@ -5,7 +5,6 @@
 % Vehicle/planet parameters p must include:
 %  p.phi ; p.T_max ; p.max_throttle ; p.min_throttle ; p.Isp ; p.g
 function [m_used, r, v, u, m] = GFOLD_fix_time(tf, N, r0, v0, rf, vf, m_wet, p)
-%N = (tf / dt) + 1;
 dt = tf / (N - 1);
 
 g0 = 9.80665; % Standard earth gravity [m/s^2]
@@ -61,5 +60,7 @@ if strcmp(cvx_status, 'Solved')
     m_used = m(1) - m(N);
 elseif strcmp(cvx_status, 'Infeasible')
     m_used = m_wet;
+else
+    fprintf('Error! %s', cvx_status);
 end
 end
