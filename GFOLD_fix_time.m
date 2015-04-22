@@ -4,7 +4,7 @@
 
 % Vehicle/planet parameters p must include:
 %  p.phi ; p.T_max ; p.max_throttle ; p.min_throttle ; p.Isp ; p.g
-function [m_used, r, v, u, m] = GFOLD_fix_time(tf, N, r0, v0, rf, vf, m_wet, p)
+function [m_used, r, v, u, m] = GFOLD_fix_time(tf, N, r0, v0, rf, vf, m_wet, theta, p)
 dt = tf / (N - 1);
 
 g0 = 9.80665; % Standard earth gravity [m/s^2]
@@ -52,6 +52,8 @@ cvx_begin QUIET
             z(i) >= z0;
             z(i) <= z1;
         end
+        % Thrust pointing constraint
+        u(2,:) >= s .* cosd(theta);
         % No sub-surface flight
         r(2,1:N-1) >= 0;
 cvx_end
