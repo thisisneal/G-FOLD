@@ -14,7 +14,7 @@ r2 = p.max_throttle * p.T_max * cosd(p.phi);
 
 cvx_begin QUIET
     % Parameterize trajectory position, velocity, thrust acceleration, ln mass
-    variables r(3,N) v(3,N) u(3,N) z(1,N) s(1,N)
+    variables r(2,N) v(2,N) u(2,N) z(1,N) s(1,N)
     % Maximize ln of final mass -> Minimize fuel used
     maximize( z(N) )
     
@@ -53,7 +53,7 @@ cvx_begin QUIET
             z(i) <= z1;
         end
         % No sub-surface flight
-        r(3,:) >= -1;
+        r(2,1:N-1) >= 0;
 cvx_end
 if strcmp(cvx_status, 'Solved')
     m = exp(z);
