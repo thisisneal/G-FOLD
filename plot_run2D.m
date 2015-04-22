@@ -1,7 +1,7 @@
 function[] = plot_run2D(tv, r, v, u, m)
 
 u_norms = norms(u);
-u_dirs = rad2deg(atan2(u(2,:), u(1,:)));
+u_dirs = 90 - rad2deg(atan2(u(2,:), u(1,:)));
 T_vals = u_norms .* m;
 
 figure; hold on;

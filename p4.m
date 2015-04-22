@@ -88,6 +88,9 @@ cvx_begin
             z(i) >= z0;
             z(i) <= z1;
         end
+        % Thrust pointing constraint
+        %theta = 50;
+        %u(2,:) >= s .* cosd(theta);
         % No sub-surface flight
         r(2,:) >= -1;
         % Glide-slope surface constraint
