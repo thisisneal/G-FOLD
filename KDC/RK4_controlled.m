@@ -7,8 +7,8 @@
 % dt  : Simulation time step (s)
 % tf  : Final time (s)
 % control_rate : Controller frequency (Hz)
-% ode_fun      : Continuous time dynamics function handle, x_dot = ode_fun(x, u)
-% control_fun  : Controller function handle, u = control_fun(x)
+% ode_fun      : Time-invariant continuous time dynamics function handle, x_dot = ode_fun(x, u)
+% control_fun  : Time-dependent controller function handle, u = control_fun(x, t)
 %
 % Outputs:
 % xs : States   (NxM)
@@ -18,7 +18,7 @@ function [xs, us, tv] = RK4_controlled(x_0, dt, tf, control_rate, ode_fun, contr
     N = 1 + (tf / dt);
     control_ticks = ceil((1 / control_rate) / dt);
     x = x_0;
-    u = control_fun(x_0);
+    u = control_fun(x_0, 0);
     xs = zeros(size(x_0, 1), N);
     us = zeros(size(u, 1), N);
     tv = 0:dt:tf;
@@ -32,7 +32,7 @@ function [xs, us, tv] = RK4_controlled(x_0, dt, tf, control_rate, ode_fun, contr
         x = x + (1 / 6) * (k1 + 2*k2 + 2*k3 + k4);
         % Update control input at specified frequency
         if mod(i, control_ticks) == 0
-            u = control_fun(x);
+            u = control_fun(x, tv(i));
         end
         xs(:,i) = x;
         us(:,i) = u;

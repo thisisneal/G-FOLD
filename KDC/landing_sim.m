@@ -15,14 +15,18 @@ p.m_dry = 1505;
 p.g = [0 ; -3.7114];
 
 dt = 0.01;
-tf = 75.0;
+tf = 74.5;
 
+% Initialize dynamics with vehicle/planet parameters
 ode_fun = @(x,u)(dynamics_2D(p,x,u));
-control_fun = @(x)(zeros(2,1));
+% Initialize controller with GFOLD-computed trajectory
+%%%[G.tv, ~, G.r, G.v, G.u, G.m] = GFOLD(50, r_0, v_0, r_d, v_d, m_0, 180, p);
+control_fun = @(x, t)(traj_follower(G, x, t));
 control_rate = 20;
 
 [xs, us, tv] = RK4_controlled(x_0, dt, tf, control_rate, ode_fun, control_fun);
 r = xs(1:2,:);
 v = xs(3:4,:);
 m = xs(5,:);
-plot_run2D(tv, r, v, us, m);
+a = [us(1,:) ./ m ; us(2,:) ./ m];
+plot_run2D(tv, r, v, a, m);
