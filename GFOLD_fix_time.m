@@ -1,9 +1,8 @@
 % Neal Bhasin
 % 2015-04-21
-% G-FOLD inner fuel-optimization routine
+% G-FOLD inner fuel-optimization routine.
 
-% Vehicle/planet parameters p must include:
-%  p.phi ; p.T_max ; p.max_throttle ; p.min_throttle ; p.Isp ; p.g
+% See GFOLD.m for description of arguments.
 function [m_used, r, v, u, m] = GFOLD_fix_time(tf, N, r0, v0, rf, vf, m_wet, theta, p)
 dt = tf / (N - 1);
 

@@ -1,7 +1,7 @@
 % Neal Bhasin
 % 2015-04-21
 % G-FOLD outer time-optimization routine. 
-
+%
 % Inputs:
 % N     : Number of knot points in discrete optimization problem
 % r0    : Initial position [m]   |  rf : Final position [m]
@@ -16,7 +16,7 @@
 % p.min_throttle : Min open throttle [.%]
 % p.T_max        : Max total thrust force at 1.0 throttle [N]
 % p.phi          : The cant angle of thrusters [deg]
-
+%
 % Outputs:
 % tv     : Vector (1xN) of time at knot points [s]
 % m_used : Fuel mass used [kg]
